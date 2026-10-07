@@ -186,6 +186,10 @@ def dibujar_mapa(df, color, hover, labels=None, colores=None, orden=None, alto=5
         fig.update_yaxes(scaleanchor="x", scaleratio=1.0 / np.cos(np.radians(13.6)))
         fig.update_layout(margin=dict(l=0, r=0, t=10, b=0), plot_bgcolor="#F4F7FB",
                           xaxis_title="Longitud", yaxis_title="Latitud")
+        for muni in df["municipio"].unique():  # nombres de municipio como referencia geográfica
+            lat0, lon0 = MUNICIPIOS[muni][:2]
+            fig.add_annotation(x=lon0, y=lat0 + 0.07, text=muni, showarrow=False,
+                               font=dict(size=11, color="#1E2761"))
     fig.update_traces(marker=dict(size=8, opacity=0.85))
     return fig
 
@@ -203,9 +207,10 @@ with st.sidebar:
     st.header("Filtros del panel")
     sel_muni = st.multiselect("Municipios", list(MUNICIPIOS), default=list(MUNICIPIOS))
     sel_uso = st.multiselect("Uso de suelo", USOS, default=USOS)
-    mapa_base = st.toggle("Mostrar mapa base de calles", value=True,
-                          help="Apágalo si tu red institucional bloquea los mapas en línea: "
-                               "los puntos se verán igual, solo sin el fondo.")
+    mapa_base = st.toggle("Usar mapa con fondo de calles (opcional)", value=False,
+                          help="Por defecto los puntos se dibujan sobre un plano de coordenadas, "
+                               "que funciona en cualquier red. Actívalo solo si tu navegador y tu "
+                               "red permiten cargar mapas en línea (CARTO / OpenStreetMap).")
     ESTILO_MAPA = "carto-positron" if mapa_base else "white-bg"
     st.divider()
     st.subheader("Reglas del semáforo")
